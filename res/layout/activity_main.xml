@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:orientation="vertical" >
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        
+        <TextView
+	        android:id="@+id/currentAmountLabel"
+        	android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+        	android:text="@string/currentMoneyLabel"/>
+        <EditText
+            android:id="@+id/currentAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:text="@string/defaultValue"/>
+        
+        
+    </LinearLayout>
+    
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal">
+    	<RadioButton android:id="@+id/add_money"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="@string/addMoney"
+        	android:onClick="onRadioClick"/>
+    	<RadioButton android:id="@+id/sub_money"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="@string/subMoney"
+    	    android:onClick="onRadioClick"/>
+	</RadioGroup>
+	
+    <EditText
+        android:id="@+id/amount_change"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="@string/updateBox" />
+    <EditText
+        android:id="@+id/what_you_bought"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/boughtHint"/>
+
+    <Button android:id="@+id/button_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/update_ammount"
+        android:onClick="Update Ammount" />
+
+</LinearLayout>
