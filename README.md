@@ -15,7 +15,7 @@ along with MoneyTracker.  If not, see <http://www.gnu.org/licenses/>.
 ## Info
 * Description:
  - This application is not available for use.
-* Version 0.1
+* Version 0.2
 * Written by: Ryan Dawkins
 * Android Version:
  - Build SDK: 4.0
@@ -23,3 +23,5 @@ along with MoneyTracker.  If not, see <http://www.gnu.org/licenses/>.
 
 ## Current Features
 * UI Built
+* Addition/Subtraction Methods
+* Initial value store
