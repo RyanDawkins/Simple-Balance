@@ -20,7 +20,10 @@ public final class R {
         public static final int button_update=0x7f070006;
         public static final int currentAmount=0x7f070001;
         public static final int currentAmountLabel=0x7f070000;
-        public static final int menu_settings=0x7f070007;
+        public static final int greetingView=0x7f070007;
+        public static final int initialBox=0x7f070008;
+        public static final int insertMoney=0x7f070009;
+        public static final int menu_settings=0x7f07000a;
         public static final int sub_money=0x7f070003;
         public static final int what_you_bought=0x7f070005;
     }
@@ -38,7 +41,10 @@ public final class R {
         public static final int boughtHint=0x7f04000a;
         public static final int currentMoneyLabel=0x7f040008;
         public static final int defaultValue=0x7f040009;
+        public static final int greeting=0x7f04000c;
         public static final int hello_world=0x7f040001;
+        public static final int initialHint=0x7f04000d;
+        public static final int insertButton=0x7f04000e;
         public static final int menu_settings=0x7f040002;
         public static final int subMoney=0x7f040007;
         public static final int title_activity_main=0x7f040003;

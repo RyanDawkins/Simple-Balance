@@ -18,11 +18,14 @@
 
 package com.dawkinstan.moneytracker;
 
+import java.text.DecimalFormat;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
+import android.widget.EditText;
 
 public class MTSettings extends Activity {
 
@@ -42,6 +45,13 @@ public class MTSettings extends Activity {
     
     public void updateMoney(View view)
 	{
+    	
+    	EditText initialEntry = (EditText) findViewById(R.id.initialBox);
+    	double amountFloat = Double.parseDouble(initialEntry.getText().toString());
+    	DecimalFormat d = new DecimalFormat("0.00");
+    	ammount = d.format(amountFloat);
+    	
+    	
 		Intent returnIntent = new Intent();
 		returnIntent.putExtra("result", ammount);
 		setResult(RESULT_OK, returnIntent);
