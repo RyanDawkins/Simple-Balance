@@ -16,7 +16,7 @@
     
  */
 
-package com.dawkinstan.moneytracker;
+package com.dawkinstan.simplebalance;
 
 import java.text.DecimalFormat;
 

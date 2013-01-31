@@ -1,9 +1,9 @@
 <resources>
 
-    <string name="app_name">MoneyTracker</string>
+    <string name="app_name">Simple Balance</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="title_activity_main">MoneyTracker</string>
+    <string name="title_activity_main">Simple Balance</string>
     <string name="update_ammount">Update funds</string>
     <string name="updateBox">Amount to update</string>
     <string name="addMoney">Addition</string>

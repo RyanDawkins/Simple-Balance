@@ -16,7 +16,7 @@
     
  */
 
-package com.dawkinstan.moneytracker;
+package com.dawkinstan.simplebalance;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -147,9 +147,9 @@ public class MainActivity extends Activity {
     	cmDisplay.setText(formattedString);
     	
     	EditText amountChange = (EditText) findViewById(R.id.amount_change);
-    	EditText whatYouBought = (EditText) findViewById(R.id.what_you_bought);
+//    	EditText whatYouBought = (EditText) findViewById(R.id.what_you_bought);
     	amountChange.setText("");
-    	whatYouBought.setText("");
+//    	whatYouBought.setText("");
 		
     }
     
