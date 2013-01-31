@@ -1,4 +1,4 @@
-# Money Tracker ChangeLog
+# Simple Balance ChangeLog
 ## Version 0.4
 
 * 01/19/13
