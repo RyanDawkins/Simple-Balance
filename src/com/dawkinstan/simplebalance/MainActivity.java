@@ -23,7 +23,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.view.Menu;
+//import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,34 +41,39 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        // Setting display where money is shown as unclickable
         EditText cmDisplay;
         cmDisplay = (EditText) findViewById(R.id.currentAmount);
         cmDisplay.setClickable(false);
         cmDisplay.setFocusable(false);
         
+        // Getting preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     	boolean firstLoad = settings.getBoolean("firstLoad", true);
+    	
         if(firstLoad)
         {
+        	// First load intent
         	Intent intent = new Intent(this, MTSettings.class);
         	try{
         		startActivityForResult(intent, 1);
         		SharedPreferences.Editor edit = settings.edit();
         		edit.putBoolean("firstLoad", false);
         		edit.commit();
-        	}
+        	} // Catches exception of the activity not existing
         	catch (Exception e){
         	}
         } else {
-        	String formattedString;
-        	DecimalFormat d = new DecimalFormat("0.00");
+        	// Formats string to have money symbol in front.
         	double currentMoney = Double.parseDouble(settings.getString("ammount", "0.00").replace("$", ""));
-        	formattedString = "$" + d.format(currentMoney);
-        	cmDisplay.setText(formattedString);
+        	this.setNewAmountInView(currentMoney);
         }
         
+        // Sets button as unclickable
         Button updateButton = (Button) findViewById(R.id.button_update);
         updateButton.setEnabled(false);
+        
+        // Listener to update the view of the ammount of money changed
         updateButton.setOnClickListener(new View.OnClickListener() {
 
         	public void onClick(View view){
@@ -80,38 +85,46 @@ public class MainActivity extends Activity {
         
         
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
-    }
     
+    // Future menu
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.activity_main, menu);
+//        return true;
+//    }
+    
+    // Handles add/subtraction radio button clicks
     public void onRadioClick(View view) {
     	
-    	boolean checked = ((RadioButton) view).isChecked();
+    	boolean isChecked = ((RadioButton) view).isChecked();
     	
+    	// Allow update to be made since a radio button was checked.
     	Button updateButton = (Button) findViewById(R.id.button_update);
     	updateButton.setEnabled(true);
     	
-    	if(checked){
+    	// Handles which operator to use
+    	if(isChecked){
     		switch(view.getId()){
     	
+    		// Addition radio button
     		case R.id.add_money:
     			isAddition = true;
     			break;
+    		// Subtraction radio button
     		case R.id.sub_money:
     			isAddition = false;
     			break;
+    		// Default set to subtract money
     		default:
     			isAddition = false;
     			break;
     		}
     	
-    	} else {}
+    	} else {} // Else statement as place-holder
     	
     }
     
+    // Function to handle updates for the new value
     public void onUpdate(View view){
 		
     	double currentMoney;
@@ -120,31 +133,35 @@ public class MainActivity extends Activity {
     	EditText cm = (EditText) findViewById(R.id.currentAmount);
     	EditText md = (EditText) findViewById(R.id.amount_change);
 
+    	// Converts currentMoney to a double by taking the object converting
+    	// to a string and then removing the dollar sign by taking the substring
     	currentMoney = Double.parseDouble(cm.getText().toString().substring(1));
-    	moneyDifference = Double.parseDouble(md.getText().toString());
     	
+    	// Gets text in the field and converts object to a string
+    	try{
+    		moneyDifference = Double.parseDouble(md.getText().toString());
+    	} catch(Exception e){ // Catches no string exception
+    		return;
+    	}
+    	
+    	// Handles math
     	if(isAddition){
-
-			// Get moneys
+			// Get moneys or die trying
 			afterMathMoney = currentMoney + moneyDifference;
-			
 		} else{
-			// Get moneys
+			// Loose moneys :(
 			afterMathMoney = currentMoney - moneyDifference;
 			
 		}
 		
+    	// Casts new afterMathMoney value to a string
 		String moneyString = "" + afterMathMoney;
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		SharedPreferences.Editor edit = settings.edit();
-		edit.putString("ammount", moneyString);
-		edit.commit();
 		
-		EditText cmDisplay = (EditText) findViewById(R.id.currentAmount);
-		String formattedString;
-    	DecimalFormat d = new DecimalFormat("0.00");
-    	formattedString = "$" + d.format(afterMathMoney);
-    	cmDisplay.setText(formattedString);
+		// Stores money in sharedPreferences
+		this.storeMoneyInPreferences(moneyString);
+		
+		// Sets value in view
+		this.setNewAmountInView(afterMathMoney);
     	
     	EditText amountChange = (EditText) findViewById(R.id.amount_change);
 //    	EditText whatYouBought = (EditText) findViewById(R.id.what_you_bought);
@@ -167,11 +184,25 @@ public class MainActivity extends Activity {
         		edit.commit();
         		EditText cmDisplay = (EditText) findViewById(R.id.currentAmount);
         		cmDisplay.setText("$" + ammount);
-//        		setContentView(cmDisplay);
     		}
     		else if(resultCode == RESULT_CANCELED)
     		{
     		}
     	}
+    }
+    
+    private void setNewAmountInView(double afterMathMoney){
+    	EditText cmDisplay = (EditText) findViewById(R.id.currentAmount);
+		String formattedString;
+    	DecimalFormat d = new DecimalFormat("0.00");
+    	formattedString = "$" + d.format(afterMathMoney);
+    	cmDisplay.setText(formattedString);
+    }
+    
+    private void storeMoneyInPreferences(String moneyString){
+    	SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		SharedPreferences.Editor edit = settings.edit();
+		edit.putString("ammount", moneyString);
+		edit.commit();
     }
 }
