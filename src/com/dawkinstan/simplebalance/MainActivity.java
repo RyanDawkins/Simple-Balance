@@ -19,38 +19,67 @@
 package com.dawkinstan.simplebalance;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-//import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Spinner;
+
 import java.text.DecimalFormat;
 
-public class MainActivity extends Activity {
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
+public class MainActivity extends SherlockFragmentActivity implements ActionBar.TabListener {
 	
 	private static boolean isAddition = false;
 	private static String PREFS_NAME = "MoneyTracker_Settings";
-	private static double afterMathMoney;
-
+	private double beforePurchase;
+	private double amountSpent;
+	private double afterPurchase;
+	private DataSource ds;
+	private int type;
+	private ActionBar actionbar;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        this.actionbar = getSupportActionBar();
+        this.actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        
+        this.actionbar.addTab(this.actionbar.newTab().setText("Balance").setTabListener(this));
+        this.actionbar.addTab(this.actionbar.newTab().setText("Transactions").setTabListener(this));
+        
+        this.type = -1;
         
         // Setting display where money is shown as unclickable
         EditText cmDisplay;
         cmDisplay = (EditText) findViewById(R.id.currentAmount);
         cmDisplay.setClickable(false);
         cmDisplay.setFocusable(false);
-        
+
+        Spinner spinner = (Spinner) findViewById(R.id.type_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.type_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        new Spr();
+
         // Getting preferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     	boolean firstLoad = settings.getBoolean("firstLoad", true);
-    	
+    	ds = new DataSource(this);
+
         if(firstLoad)
         {
         	// First load intent
@@ -65,8 +94,17 @@ public class MainActivity extends Activity {
         	}
         } else {
         	// Formats string to have money symbol in front.
-        	double currentMoney = Double.parseDouble(settings.getString("ammount", "0.00").replace("$", ""));
+        	double currentMoney;
+        	try
+        	{
+        		currentMoney = Double.parseDouble(settings.getString("ammount", "0.00").replace("$|,", ""));
+        	}
+        	catch(Exception e)
+        	{
+        		currentMoney = 0;
+        	}
         	this.setNewAmountInView(currentMoney);
+        	this.beforePurchase = currentMoney;
         }
         
         // Sets button as unclickable
@@ -82,46 +120,31 @@ public class MainActivity extends Activity {
         	
         });
         
-        
-        
     }
-    
-    // Future menu
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.activity_main, menu);
-//        return true;
-//    }
-    
+        
     // Handles add/subtraction radio button clicks
     public void onRadioClick(View view) {
     	
     	boolean isChecked = ((RadioButton) view).isChecked();
     	
-    	// Allow update to be made since a radio button was checked.
     	Button updateButton = (Button) findViewById(R.id.button_update);
     	updateButton.setEnabled(true);
     	
     	// Handles which operator to use
     	if(isChecked){
-    		switch(view.getId()){
-    	
-    		// Addition radio button
-    		case R.id.add_money:
-    			isAddition = true;
-    			break;
-    		// Subtraction radio button
-    		case R.id.sub_money:
-    			isAddition = false;
-    			break;
-    		// Default set to subtract money
-    		default:
-    			isAddition = false;
-    			break;
+    		EditText whereBought = (EditText) findViewById(R.id.where_purchased);
+    		int id = view.getId();
+    		if(id == R.id.add_money)
+    		{
+    				isAddition = true;
+    				whereBought.setHint(R.string.hint_where_given);
     		}
-    	
-    	} else {} // Else statement as place-holder
-    	
+    		else if(id == R.id.sub_money)
+    		{
+    				isAddition = false;
+    				whereBought.setHint(R.string.hint_where_purchased);
+    		}
+    	} else {}     	
     }
     
     // Function to handle updates for the new value
@@ -129,44 +152,38 @@ public class MainActivity extends Activity {
 		
     	double currentMoney;
     	double moneyDifference;
-    	
     	EditText cm = (EditText) findViewById(R.id.currentAmount);
     	EditText md = (EditText) findViewById(R.id.amount_change);
-
-    	// Converts currentMoney to a double by taking the object converting
-    	// to a string and then removing the dollar sign by taking the substring
     	currentMoney = Double.parseDouble(cm.getText().toString().substring(1));
     	
-    	// Gets text in the field and converts object to a string
     	try{
     		moneyDifference = Double.parseDouble(md.getText().toString());
     	} catch(Exception e){ // Catches no string exception
     		return;
     	}
     	
+    	this.amountSpent = moneyDifference;
+    	
     	// Handles math
     	if(isAddition){
 			// Get moneys or die trying
-			afterMathMoney = currentMoney + moneyDifference;
+			afterPurchase = currentMoney + moneyDifference;
 		} else{
 			// Loose moneys :(
-			afterMathMoney = currentMoney - moneyDifference;
+			afterPurchase = currentMoney - moneyDifference;
 			
 		}
 		
-    	// Casts new afterMathMoney value to a string
-		String moneyString = "" + afterMathMoney;
+    	// Casts new afterPurchase value to a string
+		String moneyString = "" + afterPurchase;
 		
 		// Stores money in sharedPreferences
 		this.storeMoneyInPreferences(moneyString);
 		
 		// Sets value in view
-		this.setNewAmountInView(afterMathMoney);
+		this.setNewAmountInView(afterPurchase);
     	
-    	EditText amountChange = (EditText) findViewById(R.id.amount_change);
-//    	EditText whatYouBought = (EditText) findViewById(R.id.what_you_bought);
-    	amountChange.setText("");
-//    	whatYouBought.setText("");
+		md.setText("");
 		
     }
     
@@ -191,11 +208,11 @@ public class MainActivity extends Activity {
     	}
     }
     
-    private void setNewAmountInView(double afterMathMoney){
+    private void setNewAmountInView(double afterPurchase){
     	EditText cmDisplay = (EditText) findViewById(R.id.currentAmount);
 		String formattedString;
     	DecimalFormat d = new DecimalFormat("0.00");
-    	formattedString = "$" + d.format(afterMathMoney);
+    	formattedString = "$" + d.format(afterPurchase);
     	cmDisplay.setText(formattedString);
     }
     
@@ -204,5 +221,102 @@ public class MainActivity extends Activity {
 		SharedPreferences.Editor edit = settings.edit();
 		edit.putString("ammount", moneyString);
 		edit.commit();
+		
+		EditText title = (EditText) findViewById(R.id.transaction_title);
+		EditText where = (EditText) findViewById(R.id.where_purchased);
+		
+		Transaction transaction = new Transaction(this.beforePurchase, this.afterPurchase, this.amountSpent);
+		transaction.setType(this.type);
+		try
+		{
+			String titleString = title.getText().toString();
+			title.setText("");
+			if(titleString == null)
+			{
+				titleString = "Not entered";
+			}
+			transaction.setTitle(titleString);
+			String whereString = where.getText().toString();
+			where.setText("");
+			if(whereString == null)
+			{
+				whereString = "Not entered";
+			}
+			transaction.setWhereSpent(whereString);
+		}
+		catch(Exception e){}
+		
+		transaction = ds.create(transaction);
+		
     }
+    protected void onResume()
+    {
+    	super.onResume();
+    	ds.open();
+    }
+    
+    protected void onPause()
+    {
+    	super.onPause();
+    	ds.close();
+    }
+    private class Spr implements OnItemSelectedListener
+    {
+    	
+    	public Spr()
+    	{
+    		Spinner spinner = (Spinner) findViewById(R.id.type_spinner);
+    		spinner.setOnItemSelectedListener(this);
+    	}
+    	
+    	public void onItemSelected(AdapterView<?> parent, View view, 
+                int pos, long id) {
+    		String text = parent.getItemAtPosition(pos).toString();
+    		if(text.equals("Gas"))
+    		{
+    			type = Transaction.TYPE_GAS; 
+    		}
+    		else if(text.equals("Food"))
+    		{
+    			type = Transaction.TYPE_FOOD;
+    		}
+    		else if(text.equals("Entertainment"))
+    		{
+    			type = Transaction.TYPE_ENTERTAINMENT;
+    		}
+    		else if(text.equals("Bills"))
+    		{
+    			type = Transaction.TYPE_BILLS;
+    		}
+    		else if(text.equals("Significant Other"))
+    		{
+    			type = Transaction.TYPE_SIGNIFICANT_OTHER;
+    		}
+    		Log.i("TYPE-VAL", ""+type);
+        }
+    	public void onNothingSelected(AdapterView<?> parent) {
+            type = 0;
+        }
+    }
+
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		if(tab.getText().equals("Balance")){}
+		else if(tab.getText().equals("Transactions"))
+		{
+			Intent i = new Intent(this, TransactionList.class);
+			startActivity(i);
+		}
+	}
+
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction f) {
+	}
+
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
+    
 }

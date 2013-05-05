@@ -15,13 +15,14 @@ along with Simple Balance.  If not, see <http://www.gnu.org/licenses/>.
 ## Info
 * Description:
  - This application is not available for use.
-* Version 0.2
+* Version 1.0
 * Written by: Ryan Dawkins
 * Android Version:
- - Build SDK: 4.0
- - Lowest: 2.3
+ - Build SDK: 4.2.2
+ - Lowest: 2.2
 
 ## Current Features
 * UI Built
 * Addition/Subtraction Methods
 * Initial value store
+* Log new transactions by category

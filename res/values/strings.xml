@@ -15,5 +15,19 @@
     <string name="greeting">Please enter your intial ammount:</string>
     <string name="initialHint">Ammount in dollars</string>
     <string name="insertButton">Update</string>
+    <string name="hint_where_purchased">Where\'d you buy it?</string>
+    <string name="hint_where_given">Who gave you the money?</string>
+    <string name="hint_what_given">What was it?</string>
+    <string name="title_activity_transaction">Transactions</string>
 
+    
+    <string-array name="type_array">
+        <item>Gas</item>
+        <item>Food</item>
+        <item>Entertainment</item>
+        <item>Bills</item>
+        <item>Significant Other</item>
+    </string-array>
+    
+    
 </resources>
